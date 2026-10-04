@@ -33,18 +33,24 @@ for d in (WORK, UPLOADS, MODELS):
 
 sys.path.insert(0, str(ROOT))
 import swap_engine as se  # noqa: E402
+from download_models import ensure_models  # noqa: E402
 
 CREDIT = "Made by **Ahmet Gedik** · [instagram.com/ahmetgedik67](https://www.instagram.com/ahmetgedik67)"
-
-MODELS_URLS = {
-    "inswapper_128.onnx": "https://github.com/facefusion/facefusion-assets/releases/download/models/inswapper_128.onnx",
-    "gfpgan_1.4.onnx": "https://github.com/facefusion/facefusion-assets/releases/download/models/gfpgan_1.4.onnx",
-    "face_parsing.onnx": "https://huggingface.co/jonathandinu/face-parsing/resolve/main/onnx/model.onnx",
-}
 
 
 def models_ok() -> bool:
     return (MODELS / "inswapper_128.onnx").exists() and (MODELS / "gfpgan_1.4.onnx").exists()
+
+
+def bootstrap_models() -> None:
+    """Fetch models on first start (Hugging Face Spaces keep them out of the repo)."""
+    if models_ok() and (MODELS / "face_parsing.onnx").exists():
+        print("modeller hazir")
+        return
+    print("modeller bulunamadi, indiriliyor (ilk acilista birkac dakika surebilir)...")
+    failed = ensure_models(MODELS)
+    if failed:
+        print("HATA: modeller indirilemedi:", ", ".join(failed))
 
 
 class LogQueue:
@@ -149,18 +155,16 @@ def ui_download_models(log_text):
     if models_ok() and (MODELS / "face_parsing.onnx").exists():
         yield "Tüm modeller zaten indirilmiş ✓"
         return
-    import urllib.request
-    for name, url in MODELS_URLS.items():
-        dst = MODELS / name
-        if dst.exists():
-            yield f"[skip] {name} zaten var"
-            continue
-        yield f"[indiriliyor] {name} ..."
-        tmp = dst.with_suffix(dst.suffix + ".part")
-        urllib.request.urlretrieve(url, tmp)  # nosec - pinned asset URLs
-        tmp.replace(dst)
-        yield f"[ok] {name} ({dst.stat().st_size // (1024 * 1024)} MB)"
-    yield "Tüm modeller hazır ✓"
+    lines = []
+
+    def log(msg):
+        for line in str(msg).splitlines():
+            if line.strip():
+                lines.append(line)
+
+    failed = ensure_models(MODELS, log=log)
+    yield "\n".join(lines)
+    yield ("HATA: " + ", ".join(failed)) if failed else "Tüm modeller hazır ✓"
 
 
 def ui_analyze(video, photos, sample_every):
@@ -245,7 +249,7 @@ def ui_stop():
 
 # ------------------------------------------------------------------- layout
 def build_ui():
-    with gr.Blocks(title="FaceSwap — Ahmet Gedik", theme=gr.themes.Soft()) as demo:
+    with gr.Blocks(title="FaceSwap — Ahmet Gedik") as demo:
         gr.Markdown(
             f"# 🎭 FaceSwap\n"
             f"Yüksek kaliteli video yüz değiştirme — inswapper + GFPGAN + anlamsal maske\n\n"
@@ -312,7 +316,23 @@ def build_ui():
     return demo
 
 
+def resolve_port(default: int = 7860) -> int:
+    """Honour PORT / FACESWAP_PORT but ignore junk values such as PORT=0."""
+    for key in ("PORT", "FACESWAP_PORT"):
+        value = (os.environ.get(key) or "").strip()
+        if value.isdigit() and 0 < int(value) < 65536:
+            return int(value)
+    return default
+
+
 if __name__ == "__main__":
     print(se.banner())
+    if os.environ.get("FACESWAP_AUTODOWNLOAD", "1") != "0":
+        bootstrap_models()
     demo = build_ui()
-    demo.queue(max_size=8).launch(server_name="127.0.0.1", server_port=int(os.environ.get("FACESWAP_PORT", "7860")), show_error=True)
+    on_space = bool(os.environ.get("SPACE_ID") or os.environ.get("HF_SPACE_ID"))
+    server = os.environ.get("FACESWAP_SERVER", "0.0.0.0" if on_space else "127.0.0.1")
+    kwargs = {"server_name": server, "server_port": resolve_port(), "show_error": True}
+    if int(gr.__version__.split(".")[0]) >= 6:  # Gradio 6 moved theme to launch()
+        kwargs["theme"] = gr.themes.Soft()
+    demo.queue(max_size=8).launch(**kwargs)

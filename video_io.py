@@ -15,6 +15,13 @@ import numpy as np
 def find_ffmpeg():
     binary = shutil.which('ffmpeg')
     if not binary:
+        # Hugging Face Spaces / slim containers may not have a system ffmpeg.
+        try:
+            import imageio_ffmpeg
+            binary = imageio_ffmpeg.get_ffmpeg_exe()
+        except Exception:
+            binary = None
+    if not binary:
         raise RuntimeError('FFmpeg bulunamadı; FFmpeg bin klasörünü PATH içine ekleyin')
     return binary
 
@@ -38,11 +45,15 @@ def source_rate(source, fallback):
     """Prefer the source rational timebase over an approximate OpenCV float."""
     probe = shutil.which('ffprobe')
     if not probe:
+        # imageio-ffmpeg ships ffmpeg only; without ffprobe keep the OpenCV rate.
         return str(Fraction(float(fallback)).limit_denominator(1001))
-    result = subprocess.run([probe, '-v', 'error', '-select_streams', 'v:0',
-                             '-show_entries', 'stream=r_frame_rate,avg_frame_rate',
-                             '-of', 'json', str(source)], capture_output=True, text=True, check=True)
-    streams = json.loads(result.stdout)['streams']
+    try:
+        result = subprocess.run([probe, '-v', 'error', '-select_streams', 'v:0',
+                                 '-show_entries', 'stream=r_frame_rate,avg_frame_rate',
+                                 '-of', 'json', str(source)], capture_output=True, text=True, check=True)
+        streams = json.loads(result.stdout)['streams']
+    except Exception:
+        return str(Fraction(float(fallback)).limit_denominator(1001))
     if not streams:
         raise RuntimeError(f'Video akışı bulunamadı: {source}')
     data = streams[0]

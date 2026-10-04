@@ -186,13 +186,36 @@ video ──► FaceAnalysis (buffalo_l) ──► kimlik kümeleri (embedding e
 
 Kalite profilleri `face_quality.json` içinde ayarlanabilir.
 
-## 🤗 Hugging Face Space (gelecek)
+## 🤗 Hugging Face Space
 
-Bu depo Hugging Face Space olarak da yayınlanmaya uygundur: `app.py` Gradio
-tabanlıdır. models/ klasörü repoda bulunmadığı için Space üzerinde
-`download_models.py` ya da Kurulum sekmesindeki "Modelleri İndir" düğmesi
-kullanılmalıdır (lfs veya runtime indirme). Yayınlama planına göre
-güncellenecektir.
+**🌐 Canlı Space:** https://huggingface.co/spaces/volvox67/FaceSwap
+
+Bu de **Gradio** tabanlıdır ve tamamen aynı `app.py` dosyasını çalıştırır.
+Modeller (inswapper_128 + GFPGAN + face-parsing ≈ 950 MB) repoya yüklenmez —
+**ilk açılışta otomatik indirilir** (`app.py` → `bootstrap_models()` /
+`ensure_models()`). Böylece Space deposu hafif kalır, indirme tek seferliktir.
+
+### Kendi Space'ini yayınlamak
+
+```bash
+git clone https://github.com/Volvox6767/FaceSwap
+cd FaceSwap
+# huggingface.co/settings/tokens -> "Write" token
+HF_TOKEN=hf_xxx bash publish_hf.sh FaceSwap
+```
+
+Script kodu `huggingface.co/spaces/<kullanıcı>/FaceSwap` deposuna gönderir
+(`hf/README.md` front-matter, `hf/requirements.txt` CPU bağımlılıkları).
+
+### Space'e özel ayarlar
+
+| Konu | Değer |
+|---|---|
+| SDK | `gradio` · `app_file: app.py` |
+| Hardware | `cpu-basic` (ücretsiz) — **GPU önerilir** (`t4-small`) |
+| Süre | CPU'da ~1–3 sn/kare; GPU'da ~0,2–0,5 sn/kare |
+| Model stratejisi | Runtime indirme (LFS yok, depoda model yok) |
+| ffmpeg | `imageio-ffmpeg` paketi ile garanti altında |
 
 ## 🐞 Sorun Giderme
 
@@ -218,7 +241,9 @@ FaceSwap/
 ├── runtime_utils.py     # ONNX Runtime oturum ayarları
 ├── gpu_devices.py       # DirectML aygıt seçimi (Windows)
 ├── face_quality.json    # Kalite profilleri
-├── download_models.py   # Model indirici (3 ONNX modeli)
+├── download_models.py   # Model indirici (3 ONNX modeli, runtime)
+├── hf/                  # Hugging Face Space dosyaları (README + requirements)
+├── publish_hf.sh        # Space yayınlama scripti
 ├── install.bat / install.sh  # Tek tıkla kurulum
 ├── models/              # (indirilir) 3 ONNX modeli
 └── workspace/           # videolarınız, kaynak fotoğraflar, çıktılar

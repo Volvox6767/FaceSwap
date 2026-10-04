@@ -1,0 +1,12 @@
+# Hugging Face Spaces (CPU) requirements
+gradio>=5.0,<7
+insightface==0.7.3
+onnxruntime>=1.17
+opencv-python-headless>=4.8
+numpy>=1.24,<2.0
+scikit-image>=0.21
+imageio-ffmpeg>=0.4.9
+
+# insightface builds Cython/C++ extensions at install time on Linux
+cython<3
+cmake
