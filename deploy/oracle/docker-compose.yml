@@ -1,0 +1,28 @@
+services:
+  faceswap:
+    build:
+      context: ../..
+      dockerfile: hf/Dockerfile
+    image: faceswap:local
+    container_name: faceswap
+    restart: unless-stopped
+    ports:
+      - "7860:7860"
+    environment:
+      FACESWAP_MODELS: /app/models
+      FACESWAP_WORK: /app/workspace
+      GRADIO_SERVER_NAME: 0.0.0.0
+      GRADIO_SERVER_PORT: "7860"
+    volumes:
+      - faceswap-models:/app/models
+      - faceswap-workspace:/app/workspace
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request;urllib.request.urlopen('http://127.0.0.1:7860/')"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 300s
+
+volumes:
+  faceswap-models:
+  faceswap-workspace:

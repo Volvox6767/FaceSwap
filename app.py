@@ -25,9 +25,9 @@ except ImportError:
     raise SystemExit(1)
 
 ROOT = Path(__file__).resolve().parent
-WORK = ROOT / "workspace"
+WORK = Path(os.environ.get("FACESWAP_WORK") or (ROOT / "workspace"))
 UPLOADS = WORK / "uploads"
-MODELS = ROOT / "models"
+MODELS = Path(os.environ.get("FACESWAP_MODELS") or (ROOT / "models"))
 for d in (WORK, UPLOADS, MODELS):
     d.mkdir(parents=True, exist_ok=True)
 
@@ -151,7 +151,7 @@ def ui_setup_check():
     return "\n".join(lines)
 
 
-def ui_download_models(log_text):
+def ui_download_models(_log_text=None):
     if models_ok() and (MODELS / "face_parsing.onnx").exists():
         yield "Tüm modeller zaten indirilmiş ✓"
         return
@@ -262,7 +262,7 @@ def build_ui():
                 check_btn.click(ui_setup_check, None, check_out)
                 dl_btn = gr.Button("⬇️ Modelleri İndir", variant="primary")
                 dl_out = gr.Textbox(label="İndirme günlüğü", lines=8)
-                dl_btn.click(ui_download_models, None, dl_out)
+                dl_btn.click(ui_download_models, None, dl_out, show_progress="hidden")
 
             with gr.Tab("🎬 Yüz Değiştir"):
                 with gr.Row():
@@ -330,8 +330,12 @@ if __name__ == "__main__":
     if os.environ.get("FACESWAP_AUTODOWNLOAD", "1") != "0":
         bootstrap_models()
     demo = build_ui()
+    # Container ortaminda (HF Space, Docker, Oracle VM) 0.0.0.0'a baglanmali.
     on_space = bool(os.environ.get("SPACE_ID") or os.environ.get("HF_SPACE_ID"))
-    server = os.environ.get("FACESWAP_SERVER", "0.0.0.0" if on_space else "127.0.0.1")
+    in_container = Path("/.dockerenv").exists()
+    server = os.environ.get("FACESWAP_SERVER") or os.environ.get("GRADIO_SERVER_NAME")
+    if not server:
+        server = "0.0.0.0" if (on_space or in_container) else "127.0.0.1"
     kwargs = {"server_name": server, "server_port": resolve_port(), "show_error": True}
     if int(gr.__version__.split(".")[0]) >= 6:  # Gradio 6 moved theme to launch()
         kwargs["theme"] = gr.themes.Soft()

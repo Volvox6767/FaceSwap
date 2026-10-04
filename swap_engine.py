@@ -48,8 +48,8 @@ AUTHOR_URL = "https://www.instagram.com/ahmetgedik67"
 PROVIDERS = available_providers()
 
 ROOT = Path(__file__).resolve().parent
-MODELS_DIR = ROOT / "models"
-WORK_DIR = ROOT / "workspace"
+MODELS_DIR = Path(os.environ.get("FACESWAP_MODELS") or (ROOT / "models"))
+WORK_DIR = Path(os.environ.get("FACESWAP_WORK") or (ROOT / "workspace"))
 
 FFHQ_512 = np.array(
     [

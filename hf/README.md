@@ -3,9 +3,8 @@ title: FaceSwap
 emoji: 🎭
 colorFrom: indigo
 colorTo: gray
-sdk: gradio
-sdk_version: 5.49.1
-app_file: app.py
+sdk: docker
+app_port: 7860
 pinned: false
 license: mit
 short_description: High-quality video face swap with Gradio UI

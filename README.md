@@ -190,10 +190,32 @@ Kalite profilleri `face_quality.json` içinde ayarlanabilir.
 
 **🌐 Canlı Space:** https://huggingface.co/spaces/volvox67/FaceSwap
 
-Bu de **Gradio** tabanlıdır ve tamamen aynı `app.py` dosyasını çalıştırır.
-Modeller (inswapper_128 + GFPGAN + face-parsing ≈ 950 MB) repoya yüklenmez —
-**ilk açılışta otomatik indirilir** (`app.py` → `bootstrap_models()` /
-`ensure_models()`). Böylece Space deposu hafif kalır, indirme tek seferliktir.
+Bu bir **Docker Space**'tir (`hf/Dockerfile` → `python app.py`) ve tamamen aynı
+Gradio arayüzünü çalıştırır. Modeller (inswapper_128 + GFPGAN + face-parsing
+≈ 950 MB) repoya yüklenmez — **ilk açılışta otomatik indirilir**
+(`app.py` → `bootstrap_models()` / `ensure_models()`). Böylece Space deposu
+hafif kalır; indirme tek seferliktir.
+
+> **Ücret notu (2026):** Hugging Face, ücretsiz hesaplarda Gradio ve Docker
+> Space oluşturulmasına izin vermiyor — *"Static Spaces are free for everyone,
+> but hosting Gradio and Docker Spaces on free cpu-basic requires a PRO
+> subscription."* Bu yüzden yayınlamak için `huggingface.co/pro` aboneliği
+> gerekir. Space dosyaları hazır; PRO sonrası tek komut yeterli.
+
+### Ücretsiz alternatif: Oracle Cloud Always Free (ARM64)
+
+Aynı `hf/Dockerfile` Oracle'ın kalıcı ücretsiz sunucusunda da çalışır
+(Ampere A1, ARM64 — insightface orada kaynaktan derlenir):
+
+```bash
+git clone https://github.com/Volvox6767/FaceSwap
+cd FaceSwap
+bash deploy/oracle/deploy.sh
+```
+
+Ya da `docker compose -f deploy/oracle/docker-compose.yml up -d --build`.
+Modeller kalıcı volume'a yazılır, yeniden başlatmada tekrar indirilmez.
+Not: Oracle 2026'da A1 kotasını 4 OCPU/24 GB → **2 OCPU/12 GB** düşürdü.
 
 ### Kendi Space'ini yayınlamak
 
@@ -205,17 +227,20 @@ HF_TOKEN=hf_xxx bash publish_hf.sh FaceSwap
 ```
 
 Script kodu `huggingface.co/spaces/<kullanıcı>/FaceSwap` deposuna gönderir
-(`hf/README.md` front-matter, `hf/requirements.txt` CPU bağımlılıkları).
+(`hf/README.md` front-matter, `hf/Dockerfile`, `hf/requirements.txt` CPU
+bağımlılıkları). Space oluşturma adımı PRO gerektiriyorsa script bunu net
+mesajla bildirir ve durur.
 
 ### Space'e özel ayarlar
 
 | Konu | Değer |
 |---|---|
-| SDK | `gradio` · `app_file: app.py` |
-| Hardware | `cpu-basic` (ücretsiz) — **GPU önerilir** (`t4-small`) |
+| SDK | `docker` · `app_port: 7860` |
+| Base image | `python:3.11-slim` + apt `ffmpeg`, `libgl1`, `build-essential` |
+| Hardware | `cpu-basic` — **GPU önerilir** (`t4-small`) |
 | Süre | CPU'da ~1–3 sn/kare; GPU'da ~0,2–0,5 sn/kare |
 | Model stratejisi | Runtime indirme (LFS yok, depoda model yok) |
-| ffmpeg | `imageio-ffmpeg` paketi ile garanti altında |
+| Kalıcı disk | `FACESWAP_MODELS` (Space durursa modeller silinir; persistent storage'a bağlanın) |
 
 ## 🐞 Sorun Giderme
 
@@ -242,7 +267,8 @@ FaceSwap/
 ├── gpu_devices.py       # DirectML aygıt seçimi (Windows)
 ├── face_quality.json    # Kalite profilleri
 ├── download_models.py   # Model indirici (3 ONNX modeli, runtime)
-├── hf/                  # Hugging Face Space dosyaları (README + requirements)
+├── hf/                  # Hugging Face Space dosyaları (Dockerfile + README + requirements)
+├── deploy/oracle/       # Oracle Cloud Always Free dağıtım scripti + compose
 ├── publish_hf.sh        # Space yayınlama scripti
 ├── install.bat / install.sh  # Tek tıkla kurulum
 ├── models/              # (indirilir) 3 ONNX modeli
