@@ -11,27 +11,41 @@ yüz maskesi (face parsing) ve LAB ten rengi aktarımını tek bir hattta birle�
 
 > **Made by Ahmet Gedik** — [instagram.com/ahmetgedik67](https://www.instagram.com/ahmetgedik67)
 
-## 🤗 Hugging Face
+## 🤗 Hugging Face — tarayıcıda çalışan FaceSwap
 
-**🌐 Tanıtım ve kullanım sayfası:**
-**https://huggingface.co/spaces/volvox67/FaceSwap**
-(direkt: https://volvox67-faceswap.static.hf.space)
+**🌐 https://huggingface.co/spaces/volvox67/FaceSwap**
 
-Bu sayfa FaceSwap'in ne yaptığını, kurulum adımlarını, eşleme kurallarını,
-kalite profillerini ve Docker/Oracle dağıtımını anlatır — GitHub'a girmeden
-hızlıca bakmak için ideal. Kaggle/Colab benzeri ortamlarda açıp bırakabilirsiniz.
+Bu Space **gerçekten çalışır**: video + fotoğraf yüklüyorsunuz, tarayıcınızda
+yüz değiştiriliyor. Sunucu yok, üret yok, kurulum yok — tüm ONNX çıkarımı
+kendi bilgisayarınızda ONNX Runtime ile yapılır.
 
-> **Neden sayfada uygulama yok?** Hugging Face, ücretsiz hesaplarda Gradio ve
-> Docker Space oluşturulmasına izin vermiyor (yalnızca Static Space ücretsiz):
-> *"Static Spaces are free for everyone, but hosting Gradio and Docker Spaces on
-> free `cpu-basic` requires a PRO subscription."* Bu yüzden Space **static**
-> türünde ve tanıtım/kullanım bilgisi içeriyor. Çalışan Gradio arayüzü için:
->
-> | Yol | Ücret | Nasıl |
-> |---|---|---|
-> | [Oracle Cloud Always Free](#-oracle-cloud-ücretsiz-arm64) | **Ücretsiz** | `bash deploy/oracle/deploy.sh` |
-> | HF PRO Docker Space | ~$9/ay | `HF_TOKEN=... bash publish_hf.sh FaceSwap` |
-> | [Yerel kurulum](#-kurulum) | Ücretsiz | `install.bat` / `install.sh` |
+| Aşama | Model | Boyut | Nerede çalışır |
+|---|---|---|---|
+| Yüz tespiti + 5 nokta | SCRFD `det_10g` | 17 MB | WASM |
+| Kimlik vektörü (512-D) | ArcFace `w600k_r50` | 174 MB | WASM |
+| Takas üretimi | `inswapper_128` | 554 MB | WebGPU |
+| Yüz geçiş matrisi | `emap` | 1 MB | — |
+
+Modeller [volvox67/FaceSwap-models](https://huggingface.co/volvox67/FaceSwap-models)
+deposundan CORS'lu sunulur ve tarayıcı önbelleğinde tutulur.
+
+> **Neden static Space?** Hugging Face, üretsiz hesaplarda Gradio ve Docker
+> Space oluşturulmasına izin vermiyor: *"Static Spaces are free for everyone,
+> but hosting Gradio and Docker Spaces on free cpu-basic requires a PRO
+> subscription."* Static Space ise **üretsiz** — bu yüzden uygulama tarayıcıda
+> çalışacak şekilde yazıldı (`hf/static/faceswap.js`).
+
+### Bu tarayıcı sürümünün sınırları
+
+- **Ses korunmaz** (tarayıcıda ses mux desteklenmiyor — FFmpeg ile sonradan eklenebilir)
+- **GFPGAN restorasyonu, anlamsal yüz maskesi ve LAB ten rengi uyumu yok** — bunlar
+  tarayıcıda çok ağır; sonuç sunucu sürümünden belirgin şekilde
+  daha yumuşak olur
+- **Yavaş:** ~2 sn/kare (CPU). Tespit ve kimlik eşleştirmesi *tünelleme* ile
+  her N karede bir yapılır, ara karelerde landmark'lar yeniden kullanılır
+
+**Tam kalite (sunucu sürümü, ses korumalı):** aşağıdaki kurulum ya da
+[Oracle Cloud Always Free](#-oracle-cloud-ücretsiz-arm64) / HF PRO Space.
 
 ---
 
@@ -311,7 +325,7 @@ FaceSwap/
 ├── face_quality.json    # Kalite profilleri
 ├── download_models.py   # Model indirici (3 ONNX modeli, runtime)
 ├── hf/                  # Hugging Face Space dosyaları (Dockerfile + README + requirements)
-├── hf/static/           # HF static Space: index.html tanıtım sayfası + kart
+├── hf/static/           # HF static Space: tarayıcı uygulaması (index.html + faceswap.js)
 ├── deploy/oracle/       # Oracle Cloud Always Free dağıtım scripti + compose
 ├── publish_hf.sh        # Space yayınlama scripti
 ├── install.bat / install.sh  # Tek tıkla kurulum

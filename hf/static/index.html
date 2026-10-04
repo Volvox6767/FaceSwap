@@ -5,44 +5,46 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>FaceSwap — Ahmet Gedik</title>
 <style>
-  :root{
-    --bg:#0f1115; --card:#171a21; --line:#262b36; --fg:#e8ecf4; --dim:#9aa4b8;
-    --accent:#7c5cff; --accent2:#22d3ee; --ok:#34d399; --warn:#fbbf24;
-  }
+  :root{--bg:#0f1115;--card:#171a21;--line:#262b36;--fg:#e8ecf4;--dim:#9aa4b8;
+        --accent:#7c5cff;--accent2:#22d3ee;--ok:#34d399;--warn:#fbbf24;--err:#f87171}
   *{box-sizing:border-box}
   body{margin:0;background:radial-gradient(1200px 600px at 20% -10%,#1d2140 0%,var(--bg) 55%);
-    color:var(--fg);font:16px/1.65 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+    color:var(--fg);font:15px/1.6 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
   a{color:var(--accent2)}
-  .wrap{max-width:880px;margin:0 auto;padding:48px 20px 80px}
-  header{text-align:center;padding:24px 0 8px}
-  h1{font-size:clamp(34px,6vw,54px);margin:0 0 6px;letter-spacing:-1px;
+  .wrap{max-width:1000px;margin:0 auto;padding:28px 18px 70px}
+  header{text-align:center;padding:8px 0 18px}
+  h1{font-size:clamp(28px,5vw,44px);margin:0 0 4px;
      background:linear-gradient(92deg,#fff,#a99bff 60%,#22d3ee);-webkit-background-clip:text;background-clip:text;color:transparent}
-  .tag{color:var(--dim);font-size:18px;margin:0 0 22px}
-  .row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:18px 0 30px}
-  .btn{display:inline-block;padding:11px 20px;border-radius:10px;text-decoration:none;font-weight:600;
-       background:var(--accent);color:#fff;border:1px solid transparent}
+  .tag{color:var(--dim);margin:0 0 14px}
+  .row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:12px 0}
+  .btn{display:inline-block;padding:10px 18px;border-radius:10px;text-decoration:none;font-weight:600;
+       background:var(--accent);color:#fff;border:1px solid transparent;cursor:pointer;font-size:15px;font-family:inherit}
   .btn.ghost{background:transparent;border-color:var(--line);color:var(--fg)}
-  .btn:hover{filter:brightness(1.12)}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px 24px;margin:18px 0}
-  h2{font-size:22px;margin:0 0 12px}
-  h3{font-size:17px;margin:22px 0 8px;color:var(--accent2)}
-  ul,ol{padding-left:22px;margin:8px 0}
-  li{margin:6px 0}
-  code,kbd{background:#0b0d12;border:1px solid var(--line);border-radius:6px;padding:2px 7px;font-size:14px;
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px 22px;margin:16px 0}
+  h2{font-size:20px;margin:0 0 12px}
+  h3{font-size:16px;margin:18px 0 8px;color:var(--accent2)}
+  label{display:block;margin:12px 0 6px;font-weight:600}
+  input[type=file]{width:100%;padding:10px;background:#0b0d12;border:1px solid var(--line);border-radius:10px;color:var(--fg)}
+  select,input[type=range]{width:100%}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:760px){.grid{grid-template-columns:1fr}}
+  video,canvas{width:100%;border-radius:12px;background:#000;border:1px solid var(--line)}
+  canvas.out{max-height:420px;object-fit:contain}
+  .status{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;color:var(--dim);
+          background:#0b0d12;border:1px solid var(--line);border-radius:10px;padding:10px 12px;
+          white-space:pre-wrap;word-break:break-word;min-height:44px}
+  .note{border-left:3px solid var(--warn);background:#241f10;padding:12px 16px;border-radius:0 10px 10px 0;margin:14px 0}
+  .ok{border-left:3px solid var(--ok);background:#0f2620;padding:12px 16px;border-radius:0 10px 10px 0;margin:14px 0}
+  .err{border-left:3px solid var(--err);background:#2a1416;padding:12px 16px;border-radius:0 10px 10px 0;margin:14px 0}
+  .pill{display:inline-block;font-size:12px;padding:2px 9px;border-radius:999px;background:#1d2130;
+        border:1px solid var(--line);color:var(--dim);margin:0 3px}
+  code{background:#0b0d12;border:1px solid var(--line);border-radius:6px;padding:2px 6px;font-size:13px;
     font-family:ui-monospace,Menlo,Consolas,monospace}
-  pre{background:#0b0d12;border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto}
-  pre code{background:none;border:none;padding:0}
-  table{width:100%;border-collapse:collapse;margin:10px 0}
-  th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);font-size:15px}
-  th{color:var(--dim);font-weight:600}
-  .note{border-left:3px solid var(--warn);background:#241f10;padding:12px 16px;border-radius:0 10px 10px 0;margin:16px 0}
-  .ok{border-left:3px solid var(--ok);background:#0f2620;padding:12px 16px;border-radius:0 10px 10px 0;margin:16px 0}
-  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:14px}
-  .step{background:#10131a;border:1px solid var(--line);border-radius:12px;padding:16px}
-  .step b{display:block;color:var(--accent2);margin-bottom:4px}
-  .credit{text-align:center;color:var(--dim);margin-top:40px;padding-top:24px;border-top:1px solid var(--line)}
-  .pill{display:inline-block;font-size:13px;padding:2px 10px;border-radius:999px;background:#1d2130;
-        border:1px solid var(--line);color:var(--dim);margin:0 4px}
+  .credit{text-align:center;color:var(--dim);margin-top:32px;padding-top:20px;border-top:1px solid var(--line)}
+  .progress{height:6px;background:#0b0d12;border-radius:999px;overflow:hidden;border:1px solid var(--line)}
+  .progress > div{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));width:0;transition:width .2s}
+  ul{padding-left:20px}li{margin:5px 0}
 </style>
 </head>
 <body>
@@ -50,138 +52,320 @@
 
 <header>
   <h1>🎭 FaceSwap</h1>
-  <p class="tag">Yüksek kaliteli video yüz değiştirme — inswapper + GFPGAN + anlamsal maske</p>
-  <div class="row">
-    <a class="btn" href="https://github.com/Volvox6767/FaceSwap" target="_blank" rel="noopener">GitHub Deposu</a>
-    <a class="btn ghost" href="https://github.com/Volvox6767/FaceSwap#-nasıl-kullanılır" target="_blank" rel="noopener">Kurulum ve Kullanım</a>
-    <a class="btn ghost" href="https://www.instagram.com/ahmetgedik67" target="_blank" rel="noopener">Instagram</a>
-  </div>
+  <p class="tag">Tarayıcıda çalışan video yüz değiştirme — sunucu yok, ücret yok</p>
   <div>
-    <span class="pill">Python</span><span class="pill">ONNX Runtime</span><span class="pill">InsightFace</span>
-    <span class="pill">GFPGAN</span><span class="pill">SegFormer</span><span class="pill">Gradio</span><span class="pill">Docker</span>
+    <span class="pill">ONNX Runtime Web</span><span class="pill">SCRFD</span><span class="pill">ArcFace</span>
+    <span class="pill">inswapper_128</span><span class="pill">WebGPU / WASM</span>
   </div>
 </header>
 
 <div class="card">
-  <h2>Ne yapar?</h2>
-  <p>Bir videodaki yüzleri, verdiğiniz bir fotoğrafın yüzüyle değiştirir. Komut satırından
-     <em>ya da</em> tarayıcı arayüzünden çalışır. Videonun orijinal sesi korunur.</p>
-  <div class="grid">
-    <div class="step"><b>Kimlik analizi</b>Her karede yüzler bulunur, gömüleri karşılaştırılır ve kişiler ayrıştırılır.</div>
-    <div class="step"><b>Kaliteli takas</b>128px latent + 256/512px pixel-boost, çok geçişli hizalama ile titreme azaltılır.</div>
-    <div class="step"><b>Doğallık</b>GFPGAN restorasyonu, saç/gözlük koruyan anlamsal maske ve LAB ten rengi uyumu.</div>
-    <div class="step"><b>FFmpeg</p>H.264 çıkışı, orijinal sesin AAC olarak korunması, atomik yazım.</div>
+  <h2>1 · Motoru başlat</h2>
+  <p style="color:var(--dim);margin:4px 0 12px">
+    Modeller ilk açılışta indirilir (toplam ~745 MB) ve tarayıcı önbelleğinde tutulur.
+    Sonraki açılışlarda anında açılır. <b>Chrome/Edge</b> önerilir (WebGPU).
+  </p>
+  <div class="row">
+    <button class="btn" id="btnInit">⬇️ Modelleri indir ve başlat</button>
+    <span class="pill" id="epBadge">hazır değil</span>
   </div>
+  <div class="progress"><div id="initBar"></div></div>
+  <div class="status" id="initLog">Henüz başlatılmadı.</div>
 </div>
 
 <div class="card">
-  <h2>Bu sayfada neden uygulama yok?</h2>
-  <p>Hugging Face, <b>ücretsiz hesaplarda Gradio ve Docker Space oluşturulmasına izin vermiyor</b>
-     (yalnızca Static Space ücretsiz):</p>
+  <h2>2 · Kaynak yüz fotoğrafı</h2>
+  <p style="color:var(--dim);margin:4px 0 0">
+    Takas edilecek kimliğin fotoğrafı. Net ve tek yüz içermesi sonucu iyileştirir.
+  </p>
+  <label for="srcPhoto">Fotoğraf</label>
+  <input type="file" id="srcPhoto" accept="image/*" />
+  <div class="status" id="srcStatus" style="margin-top:10px">Henüz fotoğraf seçilmedi.</div>
+</div>
+
+<div class="card">
+  <h2>3 · Video</h2>
+  <div class="grid">
+    <div>
+      <label for="vidFile">Video dosyası (.mp4 / .webm / .mov)</label>
+      <input type="file" id="vidFile" accept="video/*" />
+    </div>
+    <div>
+      <label for="fidelity">Kimlik benzerliği eşiği: <span id="fidVal">0.30</span></label>
+      <input type="range" id="fidelity" min="0.20" max="0.60" step="0.01" value="0.30" />
+      <label for="maxW">Maks. genişlik (px) — <span id="maxWVal">640</span></label>
+      <input type="range" id="maxW" min="320" max="1280" step="32" value="640" />
+      <label for="tunnel">Tespit sıklığı (her N karede bir) — <span id="tunnelVal">8</span></label>
+      <input type="range" id="tunnel" min="1" max="30" step="1" value="8" />
+      <label for="detSize">Tespit çözünürlüğü — <span id="detSizeVal">640</span></label>
+      <input type="range" id="detSize" min="320" max="640" step="160" value="640" />
+    </div>
+  </div>
+
+  <h3>Önizleme karesi</h3>
+  <video id="player" muted playsinline></video>
+  <p style="color:var(--dim);margin:8px 0 4px;font-size:14px">İşlenmiş kare:</p>
+  <img id="previewImg" alt="İşlenmiş kare önizlemesi"
+       style="width:100%;border-radius:12px;border:1px solid var(--line);display:none" />
+
+  <div class="row">
+    <button class="btn ghost" id="btnProbe" disabled>🔍 Bu kareyi test et</button>
+    <button class="btn" id="btnRun" disabled>▶️ Videoyu işle</button>
+    <button class="btn ghost" id="btnCancel" disabled>⏹ İptal</button>
+  </div>
+  <div class="progress"><div id="runBar"></div></div>
+  <div class="status" id="runLog">Motoru başlatın, sonra video yükleyin.</div>
+</div>
+
+<div class="card" id="outCard" style="display:none">
+  <h2>Sonuç</h2>
+  <p style="color:var(--dim);margin:4px 0 10px">
+    Ses <b>korunmaz</b> — tarayıcıda ses mux desteklenmiyor. Video+gorsuz.
+    Ses eklemek isterseniz FFmpeg ile:
+    <code>ffmpeg -i faceswap_video.webm -i ses.mp3 -c:v copy -c:a aac -shortest son.mp4</code>
+  </p>
+  <video class="out" id="outVideo" controls></video>
+  <div class="row"><a class="btn" id="dlLink" download="faceswap_video.webm">⬇️ Videoyu indir</a></div>
+</div>
+
+<div class="card">
+  <h2>Nasıl çalışır?</h2>
+  <ul>
+    <li><b>SCRFD</b> (17 MB) her karede yüzleri ve 5 nokta landmark'ı bulur.</li>
+    <li><b>ArcFace</b> (174 MB) her yüzü 512 boyutlu kimlik vektörüne çevirir.</li>
+    <li>Kaynak fotoğrafın vektörüyle <b>cosine benzerliği</b> karşılaştırılır; eşiği geçen yüzler seçilir.</li>
+    <li><b>inswapper_128</b> (554 MB) 128×128 hizalanmış kırpmı takas eder.</li>
+    <li>Sonuç <code>emap</code> matrisiyle latent uzayına projekte edilir, affine ile geri yapıştırılır.</li>
+    <li>Fark maskesi + Gauss bulanıklığı ile kenar ve titreme azaltılır.</li>
+  </ul>
   <div class="note">
-    “Static Spaces are free for everyone, but hosting Gradio and Docker Spaces on free
-     <code>cpu-basic</code> requires a PRO subscription.”
+    Bu sürüm bilerek hafif: <b>GFPGAN restorasyonu, anlamsal yüz maskesi ve LAB ten rengi uyumu yok</b>
+    — bunlar tarayıcıda çok ağır. Sonuç sunucu sürümünden belirgin şekilde daha yumuşak olur.
+    Tam kalite için <a href="https://github.com/Volvox6767/FaceSwap" target="_blank" rel="noopener">GitHub deposundaki sunucu sürümünü</a> kullanın.
   </div>
-  <p>Bu yüzden burada uygulama yerine <b>tanıtım ve kullanım bilgisi</b> bulunuyor.
-     Çalışan Gradio arayüzü için üç seçenek:</p>
-  <table>
-    <tr><th>Yol</th><th>Ücret</th><th>Not</th></tr>
-    <tr><td><a href="https://github.com/Volvox6767/FaceSwap#-oracle-cloud-ücretsiz" target="_blank" rel="noopener">Oracle Cloud Always Free (ARM64)</a></td><td>Ücretsiz</td><td>Ampere A1 VM + Docker, kalıcı volume</td></tr>
-    <tr><td>Hugging Face PRO Space</td><td>~$9/ay</td><td>HF ekibi tarafından GPU'ya kadar kolayca geçiş</td></tr>
-    <tr><td><a href="https://github.com/Volvox6767/FaceSwap#-kurulum" target="_blank" rel="noopener">Yerel kurulum</a></td><td>Ücretsiz</td><td>Windows / Linux, GPU desteği</td></tr>
-  </table>
-</div>
-
-<div class="card">
-  <h2>Kurulum (yerel)</h2>
-  <pre><code>git clone https://github.com/Volvox6767/FaceSwap
-cd FaceSwap
-
-# Windows
-install.bat
-
-# Linux / macOS
-bash install.sh</code></pre>
-  <p>Veya manuel:</p>
-  <pre><code>pip install -r requirements.txt
-python download_models.py   # ~950 MB, üç ONNX modeli
-python app.py               # tarayıcıda http://127.0.0.1:7860</code></pre>
-</div>
-
-<div class="card">
-  <h2>Nasıl kullanılır?</h2>
-  <div class="grid">
-    <div class="step"><b>1 · Kurulum sekmesi</b>“Sistem Kontrolü”ne bas. Modeller ilk açılışta otomatik indirilir (~950 MB).</div>
-    <div class="step"><b>2 · Videoyu yükle</b>“Yüz Değiştir” sekmesine geç, hedef videoyu seç.</div>
-    <div class="step"><b>3 · Kaynak yüz</b>Fotoğraf yükle. <b>Dosya adı kişinin adıdır</b> (örn. <code>ahmet.jpeg</code>).</div>
-    <div class="step"><b>4 · Analiz</b>“🔍 Analiz Et” → kırpıntılar ve eşleme tablosu oluşur.</div>
-    <div class="step"><b>5 · Önizle</b>“🖼 Önizle” ile sonucu kontrol et.</div>
-    <div class="step"><b>6 · Tam swap</b>“▶️ Tam Swap” → indirilebilir video.</div>
+  <div class="ok">
+    <b>Süre:</b> 1 saniyelik video ≈ 10–40 kare. CPU (WASM) ile kare başına 0,5–3 sn;
+    WebGPU varsa çok daha hızlı. Uzun videolar sabırlı ister.
   </div>
-
-  <h3>Eşleme kuralları (map-by)</h3>
-  <table>
-    <tr><th>Kural</th><th>Anlamı</th></tr>
-    <tr><td><code>top</code></td><td>En sık görünen ana konuşmacı</td></tr>
-    <tr><td><code>left</code></td><td>Soldaki kişi</td></tr>
-    <tr><td><code>first</code></td><td>İlk çıkan kişi</td></tr>
-    <tr><td><code>age</code></td><td>En yaşlı kişi</td></tr>
-  </table>
-
-  <h3>Komut satırı</h3>
-  <pre><code>python swap_engine.py run \
-  --video klip.mp4 \
-  --map "top=ahmet" \
-  --map "left=zeynep" \
-  --quality natural \
-  --resolution 1080p</code></pre>
-</div>
-
-<div class="card">
-  <h2>Kalite profilleri</h2>
-  <table>
-    <tr><th>Profil</th><th>Ne yapar</th><th>Hız</th></tr>
-    <tr><td><code>natural</code></td><td>Önerilen. GFPGAN harmanı + LAB ten uyumu, en doğal sonuç</td><td>~1–3 sn/kare (CPU)</td></tr>
-    <tr><td><code>ultra</code></td><td>Daha yüksek çözünürlük, daha çok geçiş, yavaş</td><td>~2–5 sn/kare</td></tr>
-    <tr><td><code>fast</code></td><td>Kalite önceliği yok, en hızlı; face-parsing gerektirmez</td><td>~0,3–1 sn/kare</td></tr>
-  </table>
-</div>
-
-<div class="card">
-  <h2>Docker ile çalıştırma</h2>
-  <pre><code>docker build -f hf/Dockerfile -t faceswap .
-docker run -d -p 7860:7860 \
-  -v faceswap-models:/app/models \
-  -v faceswap-workspace:/app/workspace \
-  faceswap</code></pre>
-  <p>Ücretsiz Oracle Cloud için hazır script:
-     <code>bash deploy/oracle/deploy.sh</code></p>
 </div>
 
 <div class="card">
   <h2>Etik kullanım</h2>
-  <p>Yalnızca yasal ve etik amaçlar için kullanın: kendi yüzünüzü veya
-     <b>yazılı izni aldığınız</b> kişilerin yüzünü değiştirin. Başkalarını taklit etmek,
-     aldatmak veya mahremiyet ihlali için kullanmayın.</p>
-</div>
-
-<div class="card">
-  <h2>Teşekkürler</h2>
-  <p>
-    <a href="https://github.com/deepinsight/insightface" target="_blank" rel="noopener">InsightFace</a> ·
-    <a href="https://github.com/TencentARC/GFPGAN" target="_blank" rel="noopener">GFPGAN</a> ·
-    <a href="https://huggingface.co/jonathandinu/face-parsing" target="_blank" rel="noopener">jonathandinu/face-parsing</a> ·
-    <a href="https://github.com/facefusion/facefusion-assets" target="_blank" rel="noopener">FaceFusion</a> ·
-    <a href="https://gradio.app" target="_blank" rel="noopener">Gradio</a>
-  </p>
+  <p>Yalnızca yasal ve etik amaçlar için: kendi yüzünüzü veya <b>yazılı izni aldığınız</b>
+     kişilerin yüzünü değiştirin. Başkalarını taklit etmek veya mahremiyet ihlali için kullanmayın.</p>
 </div>
 
 <div class="credit">
-  Made with ❤️ by <b>Ahmet Gedik</b><br />
+  Made with ❤️ by <b>Ahmet Gedik</b> ·
   <a href="https://www.instagram.com/ahmetgedik67" target="_blank" rel="noopener">@ahmetgedik67</a> ·
-  <a href="https://github.com/Volvox6767/FaceSwap" target="_blank" rel="noopener">github.com/Volvox6767/FaceSwap</a>
+  <a href="https://github.com/Volvox6767/FaceSwap" target="_blank" rel="noopener">github.com/Volvox6767/FaceSwap</a><br />
+  Modeller: <a href="https://huggingface.co/volvox67/FaceSwap-models" target="_blank" rel="noopener">volvox67/FaceSwap-models</a> ·
+  <a href="https://github.com/deepinsight/insightface" target="_blank" rel="noopener">InsightFace</a> ·
+  <a href="https://github.com/TencentARC/GFPGAN" target="_blank" rel="noopener">GFPGAN</a>
 </div>
 
 </div>
+
+<script src="faceswap.js"></script>
+<script>
+const $ = (id) => document.getElementById(id);
+let engine = null, identity = null, cancelled = false, busy = false;
+const player = $('player'), outVideo = $('outVideo');
+
+$('fidelity').oninput = (e) => $('fidVal').textContent = e.target.value;
+$('maxW').oninput = (e) => $('maxWVal').textContent = e.target.value;
+$('tunnel').oninput = (e) => $('tunnelVal').textContent = e.target.value;
+$('detSize').oninput = (e) => $('detSizeVal').textContent = e.target.value;
+
+function log(el, msg) { el.textContent = msg; }
+
+// ---------------------------------------------------------------- motor
+$('btnInit').onclick = async () => {
+  $('btnInit').disabled = true;
+  const st = $('initLog');
+  try {
+    st.textContent = 'ONNX Runtime yukleniyor...';
+    await loadScript(FaceSwap.ORT_JS);
+    engine = new FaceSwap.FaceSwapEngine();
+    let lastPct = 0;
+    const detSize = parseInt($('detSize').value, 10);
+    await engine.init((msg) => {
+      st.textContent = msg;
+      const m = /(\d+) \/ (\d+) MB/.exec(msg);
+      if (m) {
+        const pct = (+m[1] / +m[2]) * 100;
+        if (pct - lastPct > 2) { $('initBar').style.width = pct + '%'; lastPct = pct; }
+      }
+    }, { detSize });
+    $('initBar').style.width = '100%';
+    $('epBadge').textContent = engine.providers.join(' + ');
+    st.textContent = '✓ Motor hazir. Simdi kaynak fotoğraf ve video secin.';
+    $('btnProbe').disabled = $('btnRun').disabled = false;
+    await loadSource();
+  } catch (e) {
+    st.textContent = '✗ Hata: ' + e.message;
+    console.error(e);
+  } finally {
+    $('btnInit').disabled = false;
+  }
+};
+
+function loadScript(src) {
+  return new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = src; s.onload = res; s.onerror = () => rej(new Error('Script yuklenemedi: ' + src));
+    document.head.appendChild(s);
+  });
+}
+
+// ------------------------------------------------------------ kaynak yuz
+$('srcPhoto').onchange = (e) => {
+  const f = e.target.files[0];
+  if (!f) return;
+  const st = $('srcStatus');
+  st.textContent = 'Fotoğraf yukleniyor...';
+  const img = new Image();
+  img.onload = async () => {
+    try {
+      st.textContent = 'Yuz araniyor...';
+      const c = document.createElement('canvas');
+      c.width = img.naturalWidth; c.height = img.naturalHeight;
+      c.getContext('2d').drawImage(img, 0, 0);
+      identity = await engine.identityFromPhoto(c);
+      st.textContent = `✓ Kimlik hazir — ${c.width}×${c.height} fotoğraftan 1 yüz bulundu.`;
+    } catch (err) { st.textContent = '✗ ' + err.message; identity = null; }
+  };
+  img.onerror = () => { st.textContent = '✗ Görsel okunamadı.'; };
+  img.src = URL.createObjectURL(f);
+};
+async function loadSource() { if ($('srcPhoto').files[0]) $('srcPhoto').dispatchEvent(new Event('change')); }
+
+// ------------------------------------------------------------------ video
+$('vidFile').onchange = (e) => {
+  const f = e.target.files[0];
+  if (!f) return;
+  player.srcObject = null;
+  player.src = URL.createObjectURL(f);
+  $('runLog').textContent = `Video yuklendi: ${f.name}`;
+  $('outCard').style.display = 'none';
+};
+
+function seek(t) {
+  return new Promise((res) => {
+    const on = () => { player.removeEventListener('seeked', on); res(); };
+    player.addEventListener('seeked', on);
+    player.currentTime = t;
+  });
+}
+
+/** Videodan kareyi isleyip canvas'a cizer. */
+async function renderFrameTo(ctx, canvas, t, state) {
+  await seek(t);
+  canvas.width = player.videoWidth; canvas.height = player.videoHeight;
+  ctx.drawImage(player, 0, 0);
+  return engine.processFrame(canvas, [identity], parseFloat($('fidelity').value), state);
+}
+
+$('btnProbe').onclick = async () => {
+  if (busy || !engine || !identity) return;
+  if (!player.videoWidth) { $('runLog').textContent = 'Once video secin.'; return; }
+  busy = true;    const t0 = performance.now();
+    try {
+      const c = document.createElement('canvas');
+      const r = await renderFrameTo(c.getContext('2d'), c, Math.min(1, player.duration / 2),
+                                   { frame: 0, tracks: [], every: 1 });
+      const ms = ((performance.now() - t0) / 1000).toFixed(1);
+      $('outCard').style.display = '';
+      $('runLog').textContent =
+        `✓ ${r.detected} yuz bulundu, ${r.swapped} takas edildi, ${ms} sn (ilk kare). ` +
+        `Tünelleme ${$('tunnel').value} → sonraki kareler çok daha hızlı.`;
+      $('previewImg').src = c.toDataURL('image/jpeg', 0.9);
+      $('previewImg').style.display = 'block';
+    } catch (err) { $('runLog').textContent = '✗ ' + err.message; console.error(err); }
+    finally { busy = false; }
+};
+
+async function playPreview() { /* artik gerekmiyor */ }
+
+// -------------------------------------------------------------- tam islem
+$('btnCancel').onclick = () => { cancelled = true; };
+
+$('btnRun').onclick = async () => {
+  if (busy || !engine || !identity) return;
+  if (!player.videoWidth) { $('runLog').textContent = 'Once video secin.'; return; }
+  busy = true; cancelled = false;
+  $('btnRun').disabled = $('btnProbe').disabled = true;
+  $('btnCancel').disabled = false;
+
+  try {
+    const maxW = parseInt($('maxW').value, 10);
+    const scale = Math.min(1, maxW / player.videoWidth);
+    const W = Math.round(player.videoWidth * scale) & ~1;
+    const H = Math.round(player.videoHeight * scale) & ~1;
+
+    const fps = 10;                       // tarayicida guvenli kare hizi
+    const total = Math.max(1, Math.floor(player.duration * fps));
+    const canvas = document.createElement('canvas');
+    canvas.width = W; canvas.height = H;
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+
+    // hedef cozunurlugu degistir
+    player.style.aspectRatio = `${W} / ${H}`;
+
+    const stream = canvas.captureStream(0);
+    const track = stream.getVideoTracks()[0];
+    const rec = new MediaRecorder(stream, { mimeType: 'video/webm', videoBitsPerSecond: 4_000_000 });
+    const chunks = [];
+    rec.ondataavailable = (e) => e.data.size && chunks.push(e.data);
+    rec.start();
+
+    const t0 = performance.now();
+    let done = 0, swapped = 0;
+    const every = parseInt($('tunnel').value, 10);
+    const state = { frame: 0, tracks: [], every };
+
+    for (let i = 0; i < total; i++) {
+      if (cancelled) { log($('runLog'), '⏹ Iptal edildi.'); break; }
+      const t = i / fps;
+      await seek(t);
+      ctx.clearRect(0, 0, W, H);
+      ctx.drawImage(player, 0, 0, W, H);
+      const r = await engine.processFrame(canvas, [identity], parseFloat($('fidelity').value), state);
+      swapped += r.swapped;
+      if (track.requestFrame) track.requestFrame();
+
+      done++;
+      if (i % 2 === 0 || i === total - 1) {
+        const el = (performance.now() - t0) / 1000;
+        const eta = (el / done) * (total - done);
+        $('runBar').style.width = ((done / total) * 100).toFixed(1) + '%';
+        const fpsNow = done / Math.max(el, 0.001);
+        $('runLog').textContent =
+          `Kare ${done}/${total} (${(100 * done / total).toFixed(0)}%) · ` +
+          `${(el / done).toFixed(2)} sn/kare · ${fpsNow.toFixed(2)} kare/sn · ` +
+          `kalan ~${(eta / 60).toFixed(1)} dk · ${swapped} takas`;
+        await new Promise((r2) => setTimeout(r2, 0));
+      }
+    }
+
+    rec.stop();
+    await new Promise((r2) => { rec.onstop = r2; });
+    const blob = new Blob(chunks, { type: 'video/webm' });
+    $('outCard').style.display = '';
+    outVideo.src = URL.createObjectURL(blob);
+    $('dlLink').href = outVideo.src;
+    $('runLog').textContent =
+      `✓ Bitti: ${total} kare, ${swapped} takas, ${(blob.size / 1048576).toFixed(1)} MB · ` +
+      `${((performance.now() - t0) / 1000 / 60).toFixed(1)} dk`;
+  } catch (err) {
+    $('runLog').textContent = '✗ ' + err.message;
+    console.error(err);
+  } finally {
+    busy = false;
+    $('btnRun').disabled = $('btnProbe').disabled = false;
+    $('btnCancel').disabled = true;
+  }
+};
+</script>
 </body>
 </html>
