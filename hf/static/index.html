@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>FaceSwap — Ahmet Gedik</title>
+<style>
+  :root{
+    --bg:#0f1115; --card:#171a21; --line:#262b36; --fg:#e8ecf4; --dim:#9aa4b8;
+    --accent:#7c5cff; --accent2:#22d3ee; --ok:#34d399; --warn:#fbbf24;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:radial-gradient(1200px 600px at 20% -10%,#1d2140 0%,var(--bg) 55%);
+    color:var(--fg);font:16px/1.65 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  a{color:var(--accent2)}
+  .wrap{max-width:880px;margin:0 auto;padding:48px 20px 80px}
+  header{text-align:center;padding:24px 0 8px}
+  h1{font-size:clamp(34px,6vw,54px);margin:0 0 6px;letter-spacing:-1px;
+     background:linear-gradient(92deg,#fff,#a99bff 60%,#22d3ee);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .tag{color:var(--dim);font-size:18px;margin:0 0 22px}
+  .row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:18px 0 30px}
+  .btn{display:inline-block;padding:11px 20px;border-radius:10px;text-decoration:none;font-weight:600;
+       background:var(--accent);color:#fff;border:1px solid transparent}
+  .btn.ghost{background:transparent;border-color:var(--line);color:var(--fg)}
+  .btn:hover{filter:brightness(1.12)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px 24px;margin:18px 0}
+  h2{font-size:22px;margin:0 0 12px}
+  h3{font-size:17px;margin:22px 0 8px;color:var(--accent2)}
+  ul,ol{padding-left:22px;margin:8px 0}
+  li{margin:6px 0}
+  code,kbd{background:#0b0d12;border:1px solid var(--line);border-radius:6px;padding:2px 7px;font-size:14px;
+    font-family:ui-monospace,Menlo,Consolas,monospace}
+  pre{background:#0b0d12;border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto}
+  pre code{background:none;border:none;padding:0}
+  table{width:100%;border-collapse:collapse;margin:10px 0}
+  th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);font-size:15px}
+  th{color:var(--dim);font-weight:600}
+  .note{border-left:3px solid var(--warn);background:#241f10;padding:12px 16px;border-radius:0 10px 10px 0;margin:16px 0}
+  .ok{border-left:3px solid var(--ok);background:#0f2620;padding:12px 16px;border-radius:0 10px 10px 0;margin:16px 0}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:14px}
+  .step{background:#10131a;border:1px solid var(--line);border-radius:12px;padding:16px}
+  .step b{display:block;color:var(--accent2);margin-bottom:4px}
+  .credit{text-align:center;color:var(--dim);margin-top:40px;padding-top:24px;border-top:1px solid var(--line)}
+  .pill{display:inline-block;font-size:13px;padding:2px 10px;border-radius:999px;background:#1d2130;
+        border:1px solid var(--line);color:var(--dim);margin:0 4px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>🎭 FaceSwap</h1>
+  <p class="tag">Yüksek kaliteli video yüz değiştirme — inswapper + GFPGAN + anlamsal maske</p>
+  <div class="row">
+    <a class="btn" href="https://github.com/Volvox6767/FaceSwap" target="_blank" rel="noopener">GitHub Deposu</a>
+    <a class="btn ghost" href="https://github.com/Volvox6767/FaceSwap#-nasıl-kullanılır" target="_blank" rel="noopener">Kurulum ve Kullanım</a>
+    <a class="btn ghost" href="https://www.instagram.com/ahmetgedik67" target="_blank" rel="noopener">Instagram</a>
+  </div>
+  <div>
+    <span class="pill">Python</span><span class="pill">ONNX Runtime</span><span class="pill">InsightFace</span>
+    <span class="pill">GFPGAN</span><span class="pill">SegFormer</span><span class="pill">Gradio</span><span class="pill">Docker</span>
+  </div>
+</header>
+
+<div class="card">
+  <h2>Ne yapar?</h2>
+  <p>Bir videodaki yüzleri, verdiğiniz bir fotoğrafın yüzüyle değiştirir. Komut satırından
+     <em>ya da</em> tarayıcı arayüzünden çalışır. Videonun orijinal sesi korunur.</p>
+  <div class="grid">
+    <div class="step"><b>Kimlik analizi</b>Her karede yüzler bulunur, gömüleri karşılaştırılır ve kişiler ayrıştırılır.</div>
+    <div class="step"><b>Kaliteli takas</b>128px latent + 256/512px pixel-boost, çok geçişli hizalama ile titreme azaltılır.</div>
+    <div class="step"><b>Doğallık</b>GFPGAN restorasyonu, saç/gözlük koruyan anlamsal maske ve LAB ten rengi uyumu.</div>
+    <div class="step"><b>FFmpeg</p>H.264 çıkışı, orijinal sesin AAC olarak korunması, atomik yazım.</div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Bu sayfada neden uygulama yok?</h2>
+  <p>Hugging Face, <b>ücretsiz hesaplarda Gradio ve Docker Space oluşturulmasına izin vermiyor</b>
+     (yalnızca Static Space ücretsiz):</p>
+  <div class="note">
+    “Static Spaces are free for everyone, but hosting Gradio and Docker Spaces on free
+     <code>cpu-basic</code> requires a PRO subscription.”
+  </div>
+  <p>Bu yüzden burada uygulama yerine <b>tanıtım ve kullanım bilgisi</b> bulunuyor.
+     Çalışan Gradio arayüzü için üç seçenek:</p>
+  <table>
+    <tr><th>Yol</th><th>Ücret</th><th>Not</th></tr>
+    <tr><td><a href="https://github.com/Volvox6767/FaceSwap#-oracle-cloud-ücretsiz" target="_blank" rel="noopener">Oracle Cloud Always Free (ARM64)</a></td><td>Ücretsiz</td><td>Ampere A1 VM + Docker, kalıcı volume</td></tr>
+    <tr><td>Hugging Face PRO Space</td><td>~$9/ay</td><td>HF ekibi tarafından GPU'ya kadar kolayca geçiş</td></tr>
+    <tr><td><a href="https://github.com/Volvox6767/FaceSwap#-kurulum" target="_blank" rel="noopener">Yerel kurulum</a></td><td>Ücretsiz</td><td>Windows / Linux, GPU desteği</td></tr>
+  </table>
+</div>
+
+<div class="card">
+  <h2>Kurulum (yerel)</h2>
+  <pre><code>git clone https://github.com/Volvox6767/FaceSwap
+cd FaceSwap
+
+# Windows
+install.bat
+
+# Linux / macOS
+bash install.sh</code></pre>
+  <p>Veya manuel:</p>
+  <pre><code>pip install -r requirements.txt
+python download_models.py   # ~950 MB, üç ONNX modeli
+python app.py               # tarayıcıda http://127.0.0.1:7860</code></pre>
+</div>
+
+<div class="card">
+  <h2>Nasıl kullanılır?</h2>
+  <div class="grid">
+    <div class="step"><b>1 · Kurulum sekmesi</b>“Sistem Kontrolü”ne bas. Modeller ilk açılışta otomatik indirilir (~950 MB).</div>
+    <div class="step"><b>2 · Videoyu yükle</b>“Yüz Değiştir” sekmesine geç, hedef videoyu seç.</div>
+    <div class="step"><b>3 · Kaynak yüz</b>Fotoğraf yükle. <b>Dosya adı kişinin adıdır</b> (örn. <code>ahmet.jpeg</code>).</div>
+    <div class="step"><b>4 · Analiz</b>“🔍 Analiz Et” → kırpıntılar ve eşleme tablosu oluşur.</div>
+    <div class="step"><b>5 · Önizle</b>“🖼 Önizle” ile sonucu kontrol et.</div>
+    <div class="step"><b>6 · Tam swap</b>“▶️ Tam Swap” → indirilebilir video.</div>
+  </div>
+
+  <h3>Eşleme kuralları (map-by)</h3>
+  <table>
+    <tr><th>Kural</th><th>Anlamı</th></tr>
+    <tr><td><code>top</code></td><td>En sık görünen ana konuşmacı</td></tr>
+    <tr><td><code>left</code></td><td>Soldaki kişi</td></tr>
+    <tr><td><code>first</code></td><td>İlk çıkan kişi</td></tr>
+    <tr><td><code>age</code></td><td>En yaşlı kişi</td></tr>
+  </table>
+
+  <h3>Komut satırı</h3>
+  <pre><code>python swap_engine.py run \
+  --video klip.mp4 \
+  --map "top=ahmet" \
+  --map "left=zeynep" \
+  --quality natural \
+  --resolution 1080p</code></pre>
+</div>
+
+<div class="card">
+  <h2>Kalite profilleri</h2>
+  <table>
+    <tr><th>Profil</th><th>Ne yapar</th><th>Hız</th></tr>
+    <tr><td><code>natural</code></td><td>Önerilen. GFPGAN harmanı + LAB ten uyumu, en doğal sonuç</td><td>~1–3 sn/kare (CPU)</td></tr>
+    <tr><td><code>ultra</code></td><td>Daha yüksek çözünürlük, daha çok geçiş, yavaş</td><td>~2–5 sn/kare</td></tr>
+    <tr><td><code>fast</code></td><td>Kalite önceliği yok, en hızlı; face-parsing gerektirmez</td><td>~0,3–1 sn/kare</td></tr>
+  </table>
+</div>
+
+<div class="card">
+  <h2>Docker ile çalıştırma</h2>
+  <pre><code>docker build -f hf/Dockerfile -t faceswap .
+docker run -d -p 7860:7860 \
+  -v faceswap-models:/app/models \
+  -v faceswap-workspace:/app/workspace \
+  faceswap</code></pre>
+  <p>Ücretsiz Oracle Cloud için hazır script:
+     <code>bash deploy/oracle/deploy.sh</code></p>
+</div>
+
+<div class="card">
+  <h2>Etik kullanım</h2>
+  <p>Yalnızca yasal ve etik amaçlar için kullanın: kendi yüzünüzü veya
+     <b>yazılı izni aldığınız</b> kişilerin yüzünü değiştirin. Başkalarını taklit etmek,
+     aldatmak veya mahremiyet ihlali için kullanmayın.</p>
+</div>
+
+<div class="card">
+  <h2>Teşekkürler</h2>
+  <p>
+    <a href="https://github.com/deepinsight/insightface" target="_blank" rel="noopener">InsightFace</a> ·
+    <a href="https://github.com/TencentARC/GFPGAN" target="_blank" rel="noopener">GFPGAN</a> ·
+    <a href="https://huggingface.co/jonathandinu/face-parsing" target="_blank" rel="noopener">jonathandinu/face-parsing</a> ·
+    <a href="https://github.com/facefusion/facefusion-assets" target="_blank" rel="noopener">FaceFusion</a> ·
+    <a href="https://gradio.app" target="_blank" rel="noopener">Gradio</a>
+  </p>
+</div>
+
+<div class="credit">
+  Made with ❤️ by <b>Ahmet Gedik</b><br />
+  <a href="https://www.instagram.com/ahmetgedik67" target="_blank" rel="noopener">@ahmetgedik67</a> ·
+  <a href="https://github.com/Volvox6767/FaceSwap" target="_blank" rel="noopener">github.com/Volvox6767/FaceSwap</a>
+</div>
+
+</div>
+</body>
+</html>
