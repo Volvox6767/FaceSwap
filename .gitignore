@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pylibs/
+*.egg-info/
+
+# Models (downloaded at install time)
+models/
+
+# User data
+workspace/
+uploads/
+output/
+*.mp4
+*.mov
+*.webm
+*.avi
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Gradio
+.gradio/

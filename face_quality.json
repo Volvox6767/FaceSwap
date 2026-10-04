@@ -1,0 +1,8 @@
+{
+  "default_preset": "natural",
+  "presets": {
+    "natural": {"pixel_boost": 256, "restore_weight": 0.35, "color_strength": 0.75, "texture_weight": 0.05, "semantic_mask": true, "crf": 16},
+    "ultra": {"pixel_boost": 512, "restore_weight": 0.4, "color_strength": 0.75, "texture_weight": 0.05, "semantic_mask": true, "crf": 14},
+    "fast": {"pixel_boost": 128, "restore_weight": 0.25, "color_strength": 0.7, "texture_weight": 0.03, "semantic_mask": false, "crf": 18}
+  }
+}
